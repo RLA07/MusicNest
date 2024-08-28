@@ -1,6 +1,6 @@
 ## Licenses
 
-This project is licensed under the MIT License - see the LICENSE file for details.<br>
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.<br>
 This project includes getID3, which is licensed under the [GNU Lesser General Public License v3](LICENSE-getID3).
 
 # MusicNest - Web Streaming Musik

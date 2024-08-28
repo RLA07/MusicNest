@@ -33,6 +33,8 @@ function showMusicList(albumName) {
                     <p class="p-0 m-0">${music.artist} ~ <small>${music.duration}</small></p>
                 `;
 
+        const author = "Rangga Ayi Pratama";
+
         detailDiv.appendChild(musicCover);
         detailDiv.appendChild(musicInfo);
         musicLink.appendChild(detailDiv);
