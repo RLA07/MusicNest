@@ -1,0 +1,150 @@
+/* Html & Body start */
+html,
+body {
+  scroll-behavior: smooth;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Html & Body end */
+
+.container {
+  flex: 1;
+}
+
+/* Navbar style start */
+nav .container-fluid .navbar-brand,
+.logo {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2rem;
+}
+.logo {
+  font-weight: 500;
+  font-size: 30px;
+  line-height: 38px;
+}
+
+nav .container-fluid .collapse ul li .contact:hover,
+nav .container-fluid .collapse ul li .gallery:hover,
+nav .container-fluid .collapse ul li .sosmed:hover {
+  color: blue;
+}
+
+nav .container-fluid .collapse ul li .about:hover,
+nav .container-fluid .collapse ul li .other:hover {
+  color: rgb(0, 42, 255);
+}
+
+nav .container-fluid .collapse {
+  justify-content: end;
+}
+/* Navbar style end */
+
+/* Card style strat */
+.artist-card {
+  width: 18rem;
+  margin: 1rem;
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.artist-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.artist-img {
+  border-radius: 10px;
+  height: 250px;
+  object-fit: cover;
+}
+
+.card-img-overlay:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+}
+
+.card-img-overlay {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+
+.artist-title {
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-top: auto;
+}
+/* card style end */
+
+/* Music list start */
+.music-list {
+  display: none;
+  margin-top: 30px;
+}
+h5.title {
+  font-size: 1rem;
+}
+/* Music list end */
+
+/* Footer start */
+footer.a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  height: 3rem;
+}
+
+footer.a p {
+  display: flex;
+  height: 3rem;
+  font-size: 1.1rem;
+  justify-content: center;
+  align-items: center;
+}
+/* Footer end */
+
+/* media query */
+@media (max-width: 560px) {
+  footer.a p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .col-custom {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .artist-title {
+    font-size: 1.3rem;
+  }
+  footer.a {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 300px) {
+  footer.a p {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 260px) {
+  footer.a {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 220px) {
+  .artist-title {
+    font-size: 1.2rem;
+  }
+}
+/* media query */
