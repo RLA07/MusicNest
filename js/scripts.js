@@ -1,3 +1,4 @@
+// List-group-item scripts start //
 function showMusicList(albumName) {
   const musicListContainer = document.getElementById("musicListContainer");
   const musicList = document.getElementById("musicList");
@@ -81,3 +82,4 @@ function showMusicList(albumName) {
       console.error("There was a problem with the fetch operation:", error);
     });
 }
+// List-group-item scripts end //

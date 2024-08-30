@@ -9,9 +9,11 @@ body {
 }
 /* Html & Body end */
 
+/* Container star */
 .container {
   flex: 1;
 }
+/* Container end */
 
 /* Navbar style start */
 nav .container-fluid .navbar-brand,
@@ -27,20 +29,14 @@ nav .container-fluid .navbar-brand,
   line-height: 38px;
 }
 
-nav .container-fluid .collapse ul li .contact:hover,
-nav .container-fluid .collapse ul li .gallery:hover,
-nav .container-fluid .collapse ul li .sosmed:hover {
+nav .container-fluid .collapse ul li .nav-hover:hover {
   color: blue;
-}
-
-nav .container-fluid .collapse ul li .about:hover,
-nav .container-fluid .collapse ul li .other:hover {
-  color: rgb(0, 42, 255);
 }
 
 nav .container-fluid .collapse {
   justify-content: end;
 }
+
 /* Navbar style end */
 
 /* Card style strat */
@@ -89,6 +85,14 @@ nav .container-fluid .collapse {
 }
 h5.title {
   font-size: 1rem;
+}
+
+.music-cover {
+  width: 4.2rem;
+  height: 4.2rem;
+}
+.audio {
+  margin-top: 0.5rem;
 }
 /* Music list end */
 

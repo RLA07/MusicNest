@@ -1,0 +1,108 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.page-item {
+  margin: 0 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.page-item.active {
+  background-color: #0056b3;
+}
+
+/* Container start */
+.container {
+  flex: 1;
+}
+
+/* Music list start */
+.music-cover {
+  width: 4.2rem;
+  height: 4.2rem;
+}
+
+.audio {
+  margin-top: 0.5rem;
+}
+/* Music list end */
+
+/* Footer start */
+footer.a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  height: 3rem;
+}
+
+footer.a p {
+  display: flex;
+  height: 3rem;
+  font-size: 1.1rem;
+  justify-content: center;
+  align-items: center;
+}
+/* Footer end */
+
+/* media query */
+@media (max-width: 560px) {
+  footer.a p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .col-custom {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+  .artist-title {
+    font-size: 1.3rem;
+  }
+  footer.a {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 300px) {
+  footer.a p {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 260px) {
+  footer.a {
+    font-size: 0.6rem;
+  }
+}
+
+@media (max-width: 220px) {
+  .artist-title {
+    font-size: 1.2rem;
+  }
+}
+/* media query */
+
+/* Pagination styles */
+.pagination {
+  flex-wrap: wrap;
+}
+
+.page-item .page-link {
+  padding: 0.5rem 0.75rem;
+}
+
+@media (max-width: 650px) {
+  .page-item .page-link {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+  }
+}

@@ -1,115 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Music Streaming Web - Search Results</title>
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="style/style.css">
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Qwitcher+Grypen:wght@400;700&display=swap" rel="stylesheet">
-</head>
+    <!-- Head section start -->
+    <?php include('head.php'); ?>
+    <!-- Head section end -->
+    <title>MusicNest. - Search Results</title></head>
 <body>
     <!-- Nav section start -->
-    <nav class="navbar sticky-top navbar-expand-lg navbar-light bg-light text-dark p-1 shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand fs-4" href="./">MusicNest.</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-4 mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link about" href="#">Home</a></li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle other" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Other</a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item contact" href="#">Album</a></li>
-                            <li><a class="dropdown-item gallery" href="#">Music</a></li>
-                        </ul>
-                    </li>
-                </ul>
-                <form class="d-flex" action="search.php" method="GET">
-                    <input class="form-control me-2" type="search" name="query" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-primary" type="submit">Search</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+    <?php include('navbar.php'); ?>
     <!-- Nav section end -->
 
     <!-- Main layout start -->
     <div class="container pt-5">
         <h1 class="text-center pb-4">Search Results</h1>
-        <?php
-            $rootDir = 'Music';
-            $query = $_GET['query'];
-            $artists = array_filter(glob($rootDir . '/*'), 'is_dir');
-            $artistResults = [];
-            $albumResults = [];
-            $musicResults = [];
 
-            foreach ($artists as $artist) {
-                $artistName = basename($artist);
-                if (stripos($artistName, $query) !== false) {
-                    $artistResults[] = $artistName;
+        <?php
+        $query = isset($_GET['query']) ? strtolower($_GET['query']) : '';
+        $rootDir = 'Music';
+
+        // Function to search files and directories
+        function searchFiles($dir, $query) {
+            $results = [];
+            $directories = glob($dir . '/*', GLOB_ONLYDIR);
+            
+            foreach ($directories as $directory) {
+                if (stripos(basename($directory), $query) !== false) {
+                    $results['artists'][] = $directory;
                 }
-                $albums = array_filter(glob($artist . '/*'), 'is_dir');
-                foreach ($albums as $album) {
-                    $albumName = basename($album);
-                    if (stripos($albumName, $query) !== false) {
-                        $albumResults[] = [
-                            'artist' => $artistName,
-                            'album' => $albumName
-                        ];
+
+                $subDirs = glob($directory . '/*', GLOB_ONLYDIR);
+                foreach ($subDirs as $subDir) {
+                    if (stripos(basename($subDir), $query) !== false) {
+                        $results['albums'][] = $subDir;
                     }
-                    $musicFiles = glob($album . '/*.m4a');
-                    foreach ($musicFiles as $music) {
-                        $musicName = basename($music, '.m4a');
-                        if (stripos($musicName, $query) !== false) {
-                            $musicResults[] = [
-                                'artist' => $artistName,
-                                'album' => $albumName,
-                                'music' => $musicName
-                            ];
+
+                    $musicFiles = glob($subDir . '/*.{mp3,m4a}', GLOB_BRACE);
+                    foreach ($musicFiles as $file) {
+                        if (stripos(basename($file), $query) !== false) {
+                            $results['music'][] = $file;
                         }
                     }
                 }
             }
+            return $results;
+        }
 
-            if (!empty($artistResults)) {
-                echo '<h2>Artists</h2>';
-                echo '<ul class="list-group mb-4">';
-                foreach ($artistResults as $artist) {
-                    echo '<li class="list-group-item"><a href="albums.php?artist=' . $artist . '">' . $artist . '</a></li>';
-                }
-                echo '</ul>'; // Create by Rangga Ayi Pratama | &copy 2024
-            }
-
-            if (!empty($albumResults)) {
-                echo '<h2>Albums</h2>';
-                echo '<ul class="list-group mb-4">';
-                foreach ($albumResults as $result) {
-                    echo '<li class="list-group-item"><a href="albums.php?artist=' . $result['artist'] . '">' . $result['album'] . ' - ' . $result['artist'] . '</a></li>';
-                }
-                echo '</ul>';
-            }
-
-            if (!empty($musicResults)) {
-                echo '<h2>Music</h2>';
-                echo '<ul class="list-group mb-4">';
-                foreach ($musicResults as $result) {
-                    echo '<li class="list-group-item"><a href="play.php?artist=' . $result['artist'] . '&album=' . $result['album'] . '&song=' . $result['music'] . '">' . $result['music'] . ' - ' . $result['album'] . ' - ' . $result['artist'] . '</a></li>';
-                }
-                echo '</ul>';
-            }
-
-            if (empty($artistResults) && empty($albumResults) && empty($musicResults)) {
-                echo '<p>No results found.</p>';
-            }
+        $results = searchFiles($rootDir, $query);
         ?>
+
+        <!-- Display Search Results -->
+        <?php if (!empty($results)): ?>
+
+            <!-- Artists -->
+            <?php if (!empty($results['artists'])): ?>
+            <h3>Artists</h3>
+            <div class="row d-flex justify-content-center align-items-center">
+                <?php foreach ($results['artists'] as $artist): ?>
+                    <?php
+                    $artistName = basename($artist);
+                    $imagePaths = glob($artist . '/*.avif');
+                    
+                    $imagePath = !empty($imagePaths) ? $imagePaths[0] : 'https://placehold.jp/300x300.png';
+                    ?>
+                    <div class="col-6 col-md-3 d-flex justify-content-center col-custom">
+                        <div class="card artist-card">
+                            <a href="albums.php?artist=<?php echo urlencode($artistName); ?>">
+                                <img src="<?php echo $imagePath; ?>" class="card-img artist-img" alt="<?php echo htmlspecialchars($artistName); ?>">
+                                <div class="card-img-overlay d-flex align-items-center justify-content-center">
+                                    <h4 class="artist-title"><?php echo htmlspecialchars($artistName); ?></h4>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+
+            <!-- Albums -->
+            <?php if (!empty($results['albums'])): ?>
+            <h3>Albums</h3>
+            <div class="row d-flex justify-content-center align-items-center">
+                <?php foreach ($results['albums'] as $album): ?>
+                    <?php
+                    $albumName = basename($album);
+                    $artistName = basename(dirname($album));
+                    $albumCover = 'https://placehold.jp/300x300.png';
+
+                    $m4aFiles = glob($album . '/*.m4a');
+                    if (count($m4aFiles) > 0) {
+                        require_once('getid3/getid3.php');
+                        $getID3 = new getID3;
+                        $file = $getID3->analyze($m4aFiles[0]);
+                        if (!empty($file['comments']['picture'])) {
+                            $imageData = $file['comments']['picture'][0]['data'];
+                            $mimeType = $file['comments']['picture'][0]['image_mime'];
+                            $base64 = base64_encode($imageData);
+                            $albumCover = 'data:' . $mimeType . ';base64,' . $base64;
+                        }
+                    }
+                    ?>
+                    <div class="col-6 col-md-3 d-flex justify-content-center col-custom">
+                        <div class="card artist-card">
+                            <a href="albums.php?artist=<?php echo urlencode($artistName); ?>">
+                                <img src="<?php echo $albumCover; ?>" class="card-img artist-img" alt="<?php echo htmlspecialchars($albumName); ?>">
+                                <div class="card-img-overlay d-flex align-items-center justify-content-center">
+                                    <h4 class="artist-title"><?php echo htmlspecialchars($albumName); ?></h4>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+
+            <!-- Music Section -->
+            <?php if (!empty($results['music'])): ?>
+            <h3>Music</h3>
+            <div id="musicListContainer" class="list-group list-group-flush">
+                <?php foreach ($results['music'] as $music): ?>
+                    <?php
+                    $musicName = basename($music, '.m4a');
+                    $albumName = basename(dirname($music));
+                    $artistName = basename(dirname(dirname($music)));
+
+                    $musicCover = 'https://placehold.jp/300x300.png';
+                    $m4aFiles = [$music];
+                    if (count($m4aFiles) > 0) {
+                        $getID3 = new getID3;
+                        $file = $getID3->analyze($m4aFiles[0]);
+                        if (!empty($file['comments']['picture'])) {
+                            $imageData = $file['comments']['picture'][0]['data'];
+                            $mimeType = $file['comments']['picture'][0]['image_mime'];
+                            $base64 = base64_encode($imageData);
+                            $musicCover = 'data:' . $mimeType . ';base64,' . $base64;
+                        }
+                    }
+
+                    $duration = !empty($file['playtime_string']) ? $file['playtime_string'] : 'Unknown Duration';
+                    ?>
+                    <a href="#" class="list-group-item list-group-item-action p-2 m-0">
+                        <div class="detail d-flex align-items-center">
+                            <img src="<?php echo $musicCover; ?>" alt="<?php echo htmlspecialchars($musicName); ?>" class="music-cover" style="width: 4.2rem; height: 4.2rem;">
+                            <div class="music-info d-flex flex-column p-3 pt-0 pb-0 justify-content-center">
+                                <h5 class="p-0 m-0 title"><?php echo htmlspecialchars($musicName); ?></h5>
+                                <p class="p-0 m-0"><?php echo htmlspecialchars($artistName); ?> ~ <small><?php echo $duration; ?></small></p>
+                            </div>
+                        </div>
+                        <div class="audio mt-2" style="display: none;">
+                            <audio controls style="width: 100%;">
+                                <source src="<?php echo htmlspecialchars($music); ?>" type="audio/x-m4a">
+                                Your browser does not support the audio element.
+                            </audio>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+            <?php else: ?>
+                <p class="text-center">No results found.</p>
+            <?php endif; ?>
+        <a href="index.php" class="btn btn-secondary mt-5">Back to Home</a>
     </div>
     <!-- Main layout end -->
 
@@ -119,6 +169,8 @@
     </footer>
     <!-- Footer end -->
 
+    <!-- My Script -->
+     <script src="js/search.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
