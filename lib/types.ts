@@ -5,4 +5,5 @@ export interface Song {
   album: string;
   artwork: string | null;
   duration_ms: number | null;
+  track_no?: number | null;
 }

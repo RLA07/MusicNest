@@ -14,13 +14,13 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-md space-y-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
-      <div className="rounded-xl border border-black/10 dark:border-white/10 p-4 space-y-2">
+      <div className="rounded-xl border border-border bg-surface p-5 space-y-3">
         <Row label="Artists" value={a[0].c} />
         <Row label="Albums" value={al[0].c} />
         <Row label="Songs" value={s[0].c} />
-        <Row label="Last scan" value={st[0]?.value_ ?? 'never'} />
+        <Row label="Last scan" value={st[0]?.value_ ? new Date(st[0].value_).toLocaleString('id-ID') : 'never'} />
       </div>
-      <p className="text-sm text-zinc-500">Folder musik: <code className="text-xs">{MUSIC_DIR}</code></p>
+      <p className="text-sm text-muted">Folder musik: <code className="text-xs">{MUSIC_DIR}</code></p>
       <ScanButton />
     </div>
   );
@@ -29,7 +29,7 @@ export default async function SettingsPage() {
 function Row({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex justify-between">
-      <span className="text-zinc-500">{label}</span>
+      <span className="text-muted">{label}</span>
       <span className="font-medium">{value}</span>
     </div>
   );

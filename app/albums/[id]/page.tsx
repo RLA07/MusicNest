@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 import { ensureSchema, pool } from '@/lib/db';
+import { getFavIds } from '@/lib/favorites';
 import ArtworkCard from '@/components/ArtworkCard';
 import SongList from '@/components/SongList';
 import { fmtDuration } from '@/lib/format';
@@ -24,18 +25,19 @@ export default async function AlbumDetail({ params }: { params: Promise<{ id: st
      WHERE s.album_id = ? ORDER BY s.disc_no, s.track_no, s.id`, [albumId]
   );
   const totalDur = songs.reduce((s: number, x: any) => s + (x.duration_ms ?? 0), 0);
+  const favs = await getFavIds();
 
   return (
     <div>
-      <div className="flex gap-6 mb-8">
+      <div className="flex gap-8 items-end mb-8">
         <ArtworkCard artwork={al.artwork} alt={al.name} size={220} />
-        <div className="flex flex-col justify-end">
-          <h1 className="text-3xl font-bold">{al.name}</h1>
-          <p className="text-lg text-zinc-500">{al.artist}</p>
-          <p className="text-sm text-zinc-400">{al.year ?? ''} · {songs.length} lagu · {fmtDuration(totalDur)}</p>
+        <div className="pb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent">Album</p>
+          <h1 className="text-4xl font-semibold mt-1">{al.name}</h1>
+          <p className="text-muted mt-2">{al.artist} · {al.year ?? ''} · {songs.length} lagu · {fmtDuration(totalDur)}</p>
         </div>
       </div>
-      <SongList songs={songs} />
+      <SongList songs={songs} favs={favs} />
     </div>
   );
 }

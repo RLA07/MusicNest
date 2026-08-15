@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ensureSchema, pool } from '@/lib/db';
 import ArtworkCard from '@/components/ArtworkCard';
+import MediaCard from '@/components/MediaCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,14 +17,16 @@ export default async function ArtistDetail({ params }: { params: Promise<{ id: s
   );
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">{a[0].name}</h1>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="flex items-center gap-6 mb-8">
+        <ArtworkCard artwork={albums.find(a => a.artwork)?.artwork ?? null} alt={a[0].name} size={200} />
+        <div>
+          <h1 className="text-3xl font-semibold">{a[0].name}</h1>
+          <p className="text-muted mt-1">{albums.length} album</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {albums.map((al) => (
-          <Link key={al.id} href={`/albums/${al.id}`} className="group">
-            <ArtworkCard artwork={al.artwork} alt={al.name} size={200} />
-            <p className="mt-2 font-medium truncate group-hover:underline">{al.name}</p>
-            {al.year && <p className="text-sm text-zinc-500">{al.year}</p>}
-          </Link>
+          <MediaCard key={al.id} href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.year?.toString()} />
         ))}
       </div>
     </div>

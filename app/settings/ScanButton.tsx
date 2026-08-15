@@ -14,7 +14,7 @@ export default function ScanButton() {
       const res = await fetch('/api/scan', { method: 'POST' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setResult(`Scanned ${data.files} files. Artists: ${data.artists}, Albums: ${data.albums}, Songs: ${data.songs}. New: ${data.newSongs}, Updated: ${data.updated}, Removed: ${data.removed}.`);
+      setResult(`${data.files} files — ${data.artists} artists, ${data.albums} albums, ${data.songs} songs. New: ${data.newSongs}, Updated: ${data.updated}, Removed: ${data.removed}.`);
       router.refresh();
     } catch (e: any) {
       setResult(`Error: ${e.message}`);
@@ -28,11 +28,11 @@ export default function ScanButton() {
       <button
         onClick={scan}
         disabled={running}
-        className="rounded-full bg-black px-6 py-2.5 text-sm font-semibold text-white disabled:opacity-50 dark:bg-white dark:text-black"
+        className="rounded-full bg-accent px-7 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-hover transition-colors disabled:opacity-50"
       >
         {running ? 'Scanning...' : 'Scan Library'}
       </button>
-      {result && <p className="text-sm text-zinc-500">{result}</p>}
+      {result && <p className="text-sm text-muted">{result}</p>}
     </div>
   );
 }

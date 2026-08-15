@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ensureSchema, pool } from '@/lib/db';
-import ArtworkCard from '@/components/ArtworkCard';
+import MediaCard from '@/components/MediaCard';
 import { fmtDuration } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -12,9 +12,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   if (!term) {
     return (
-      <div className="py-20 text-center text-zinc-500">
-        <h1 className="text-2xl font-semibold mb-2">Search</h1>
-        <p>Cari artist, album, atau lagu.</p>
+      <div className="py-20 text-center text-muted">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mx-auto mb-4 opacity-40" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" /><path d="m21 21-4-4" />
+        </svg>
+        <h1 className="text-xl font-semibold mb-1">Search</h1>
+        <p className="text-sm">Cari artist, album, atau lagu di library-mu.</p>
       </div>
     );
   }
@@ -37,15 +40,18 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">Hasil untuk "{term}"</h1>
-      {empty && <p className="text-zinc-500">No results.</p>}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold">Hasil untuk "{term}"</h1>
+        <p className="text-sm text-muted mt-1">{artists.length + albums.length + songs.length} hasil</p>
+      </div>
+      {empty && <p className="text-muted">Tidak ada hasil.</p>}
 
       {artists.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-3">Artists</h2>
           <div className="space-y-1">
             {artists.map((a) => (
-              <Link key={a.id} href={`/artists/${a.id}`} className="block p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 font-medium">
+              <Link key={a.id} href={`/artists/${a.id}`} className="block p-2.5 rounded-lg hover:bg-surface-hover transition-colors font-medium">
                 {a.name}
               </Link>
             ))}
@@ -56,13 +62,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       {albums.length > 0 && (
         <section className="mb-8">
           <h2 className="text-lg font-semibold mb-3">Albums</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {albums.map((al) => (
-              <Link key={al.id} href={`/albums/${al.id}`} className="group">
-                <ArtworkCard artwork={al.artwork} alt={al.name} size={200} />
-                <p className="mt-2 font-medium truncate group-hover:underline">{al.name}</p>
-                <p className="text-sm text-zinc-500 truncate">{al.artist}</p>
-              </Link>
+              <MediaCard key={al.id} href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.artist} />
             ))}
           </div>
         </section>
@@ -73,12 +75,12 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
           <h2 className="text-lg font-semibold mb-3">Songs</h2>
           <div className="space-y-1">
             {songs.map((s) => (
-              <div key={s.id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5">
+              <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-surface-hover transition-colors">
                 <div className="flex-1 min-w-0">
                   <p className="truncate font-medium">{s.title}</p>
-                  <p className="text-sm text-zinc-500 truncate">{s.artist} · {s.album}</p>
+                  <p className="text-sm text-muted truncate">{s.artist} · {s.album}</p>
                 </div>
-                <span className="text-sm text-zinc-500">{fmtDuration(s.duration_ms)}</span>
+                <span className="text-sm text-muted">{fmtDuration(s.duration_ms)}</span>
               </div>
             ))}
           </div>
