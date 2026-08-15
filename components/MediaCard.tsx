@@ -18,7 +18,7 @@ export default function MediaCard({ href, artwork, title, subtitle, songs, playI
   const p = usePlayer();
   const canPlay = !!songs?.length;
   return (
-    <Link href={href} className="group relative rounded-xl p-3 bg-surface hover:bg-surface-hover transition-colors">
+    <Link href={href} className="group relative rounded-xl p-3 bg-surface hover:bg-surface-hover transition-all card-hover">
       <div className="relative">
         <ArtworkCard artwork={artwork} alt={title} size={200} />
         {canPlay && (

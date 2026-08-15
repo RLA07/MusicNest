@@ -71,6 +71,26 @@ input[type="range"]::-moz-range-thumb {
 
 /* ---------- animasi & mikro-interaksi ---------- */
 
+/* hero glow / gradient text */
+.text-gradient {
+  background: linear-gradient(120deg, #1ed760, #4ade80, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.hero-glow {
+  box-shadow: 0 0 80px rgba(30, 215, 96, 0.25);
+}
+
+/* subtle card lift */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+
 /* scroll reveal (dipakai Reveal.tsx) */
 .reveal {
   opacity: 0;
