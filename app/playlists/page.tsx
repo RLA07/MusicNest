@@ -1,4 +1,5 @@
 import { ensureSchema, pool } from '@/lib/db';
+import Reveal from '@/components/Reveal';
 import CreatePlaylist from './CreatePlaylist';
 import PlaylistCard from './PlaylistCard';
 
@@ -20,7 +21,7 @@ export default async function PlaylistsPage() {
       {rows.length === 0
         ? <p className="text-muted text-sm">Belum ada playlist. Buat satu untuk mulai.</p>
         : <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {rows.map((p) => <PlaylistCard key={p.id} {...p} />)}
+            {rows.map((p, i) => <Reveal key={p.id} delayMs={i * 40}><PlaylistCard {...p} /></Reveal>)}
           </div>
       }
     </div>

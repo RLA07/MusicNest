@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ensureSchema, pool } from '@/lib/db';
 import ArtworkCard from '@/components/ArtworkCard';
 import MediaCard from '@/components/MediaCard';
+import Reveal from '@/components/Reveal';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,8 +26,10 @@ export default async function ArtistDetail({ params }: { params: Promise<{ id: s
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {albums.map((al) => (
-          <MediaCard key={al.id} href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.year?.toString()} />
+        {albums.map((al, i) => (
+          <Reveal key={al.id} delayMs={i * 40}>
+            <MediaCard href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.year?.toString()} />
+          </Reveal>
         ))}
       </div>
     </div>

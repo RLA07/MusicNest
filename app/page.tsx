@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { ensureSchema, pool } from '@/lib/db';
 import ArtworkCard from '@/components/ArtworkCard';
 import MediaCard from '@/components/MediaCard';
+import Reveal from '@/components/Reveal';
 import { fmtDuration } from '@/lib/format';
 
 export const dynamic = 'force-dynamic';
@@ -13,21 +13,37 @@ export default async function Home() {
      FROM albums al JOIN artists a ON al.artist_id = a.id
      ORDER BY RAND() LIMIT 13`
   );
+  const ids = albums.map((a) => a.id);
   const [songs] = await pool.query<any[]>(
+    `SELECT s.id, s.title, s.duration_ms, s.album_id, al.name AS album, ar.name AS artist, al.artwork
+     FROM songs s
+     JOIN albums al ON s.album_id = al.id
+     JOIN artists ar ON al.artist_id = ar.id
+     WHERE s.album_id IN (${ids.map(() => '?').join(',')})
+     ORDER BY s.disc_no, s.track_no`, ids
+  );
+  const [recent] = await pool.query<any[]>(
     `SELECT s.id, s.title, s.duration_ms, al.name AS album, ar.name AS artist, al.artwork
      FROM songs s
      JOIN albums al ON s.album_id = al.id
      JOIN artists ar ON al.artist_id = ar.id
      ORDER BY s.id DESC LIMIT 10`
   );
+  const byAlbum = new Map<number, any[]>();
+  for (const s of songs) {
+    if (!byAlbum.has(s.album_id)) byAlbum.set(s.album_id, []);
+    byAlbum.get(s.album_id)!.push(s);
+  }
 
   return (
     <div className="space-y-10">
       <section>
         <h2 className="text-xl font-semibold mb-4">Album Acak</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {albums.map((al) => (
-            <MediaCard key={al.id} href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.artist} />
+          {albums.map((al, i) => (
+            <Reveal key={al.id} delayMs={i * 40}>
+              <MediaCard href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.artist} songs={byAlbum.get(al.id)} />
+            </Reveal>
           ))}
         </div>
       </section>
@@ -35,7 +51,7 @@ export default async function Home() {
       <section>
         <h2 className="text-xl font-semibold mb-4">Terbaru</h2>
         <div className="space-y-1">
-          {songs.map((s) => (
+          {recent.map((s) => (
             <div key={s.id} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-surface-hover transition-colors">
               <ArtworkCard artwork={s.artwork} alt={s.title} size={48} radius="rounded-md" />
               <div className="flex-1 min-w-0">

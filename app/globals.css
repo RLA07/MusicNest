@@ -68,3 +68,61 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 9999px;
   background: var(--foreground);
 }
+
+/* ---------- animasi & mikro-interaksi ---------- */
+
+/* scroll reveal (dipakai Reveal.tsx) */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  transition-delay: var(--d, 0ms);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* equalizer bars — dipakai untuk indikator "sedang diputar" */
+@keyframes eq {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq 1s ease-in-out infinite;
+}
+
+/* spinning vinyl di PlayerBar saat isPlaying */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.vinyl-spin {
+  animation: spin 8s linear infinite;
+}
+
+/* album art subtle rotate di FullPlayer */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+.float-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* progress slider — isi track mengikuti posisi */
+input[type="range"].progress {
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--progress, 0%),
+    var(--border) var(--progress, 0%),
+    var(--border) 100%
+  );
+}
+
+/* disable motion jika user memilih reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .vinyl-spin, .float-slow, .eq-bar { animation: none; }
+}

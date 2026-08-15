@@ -12,7 +12,7 @@ export default function SongList({ songs, showAlbum = false, favs }: { songs: So
       {songs.length > 1 && (
         <button
           onClick={() => p.setQueueAndPlay(songs, 0)}
-          className="mb-4 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-hover hover:scale-105 transition-all cursor-pointer"
+          className="mb-4 rounded-full bg-accent px-6 py-2.5 text-sm font-semibold text-on-accent hover:bg-accent-hover hover:scale-105 active:scale-95 transition-all cursor-pointer"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="inline mr-1.5 -mt-0.5" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
           Play All
@@ -22,18 +22,32 @@ export default function SongList({ songs, showAlbum = false, favs }: { songs: So
         {songs.map((s, i) => {
           const isActive = activeId === s.id;
           return (
-            <button
+            <div
               key={s.id}
+              role="button"
+              tabIndex={0}
               onClick={() => p.setQueueAndPlay(songs, i)}
-              className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors cursor-pointer ${
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); p.setQueueAndPlay(songs, i); } }}
+              className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors cursor-pointer group ${
                 isActive ? 'bg-accent/10' : 'hover:bg-surface-hover'
               }`}
               aria-pressed={isActive}
             >
               <span className={`text-sm w-6 text-right shrink-0 ${isActive ? 'text-accent' : 'text-muted'}`}>
-                {isActive
-                  ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="inline"><path d="M8 5v14l11-7z"/></svg>
-                  : (s.track_no ?? i + 1)}
+                {isActive && p.isPlaying ? (
+                  <span className="inline-flex items-end gap-[2px] h-4 align-middle" aria-hidden="true">
+                    <span className="eq-bar w-[3px] h-4 bg-accent rounded" style={{ animationDelay: '0ms' }} />
+                    <span className="eq-bar w-[3px] h-4 bg-accent rounded" style={{ animationDelay: '150ms' }} />
+                    <span className="eq-bar w-[3px] h-4 bg-accent rounded" style={{ animationDelay: '300ms' }} />
+                  </span>
+                ) : (
+                  <span className="group-hover:hidden">{s.track_no ?? i + 1}</span>
+                )}
+                {!isActive && (
+                  <span className="hidden group-hover:inline text-accent" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="inline"><path d="M8 5v14l11-7z"/></svg>
+                  </span>
+                )}
               </span>
               <div className="flex-1 min-w-0">
                 <p className={`truncate ${isActive ? 'text-accent font-medium' : 'font-medium'}`}>{s.title}</p>
@@ -41,7 +55,7 @@ export default function SongList({ songs, showAlbum = false, favs }: { songs: So
               </div>
               <span className="text-sm text-muted shrink-0">{fmtDuration(s.duration_ms)}</span>
               <FavButton songId={s.id} initial={favs?.has(s.id) ?? false} />
-            </button>
+            </div>
           );
         })}
       </div>
