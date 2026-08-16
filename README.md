@@ -97,6 +97,18 @@ Saat halaman artis dibuka pertama kali, MusicNest otomatis mengambil dan menyimp
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="public/screenshots/home.png" alt="Home"/>
+  <img src="public/screenshots/full-player.png" alt="Full Player"/>
+  <img src="public/screenshots/Detail_Artist.png" alt="Detail Artist"/>
+  <img src="public/screenshots/Detail_Album.png" alt="Detail Album"/>
+  <img src="public/screenshots/search.png" alt="Search"/>
+</p>
+
+---
+
 ## Persyaratan Sistem
 
 | Komponen    | Minimum                             | Catatan                                                                  |
