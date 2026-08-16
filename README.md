@@ -116,7 +116,7 @@ Saat halaman artis dibuka pertama kali, MusicNest otomatis mengambil dan menyimp
 ### 1. Clone Repositori
 
 ```bash
-git clone https://github.com/namauser/musicnest.git
+git clone https://github.com/RLA07/MusicNest.git
 cd musicnest
 ```
 
@@ -137,7 +137,7 @@ cp .env.example .env.local
 Buka `.env.local` dan isi:
 
 ```env
-MUSIC_DIR=C:\Users\NamaKamu\Music
+MUSIC_DIR=D:\Music
 DATA_DIR=./data
 MYSQL_HOST=localhost
 MYSQL_PORT=3306
