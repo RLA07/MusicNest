@@ -18,9 +18,6 @@ export const pool = mysql.createPool({
   charset: 'utf8mb4',
 });
 
-// alias untuk route handler (mysql2 promise style: pool.query, BUKAN prepare)
-export const db = pool;
-
 // Bootstrap schema (jalan sekali saat startup)
 let bootstrapped = false;
 export async function ensureSchema() {
@@ -34,6 +31,18 @@ export async function ensureSchema() {
   const conn = await pool.getConnection();
   try {
     for (const s of stmts) await conn.query(s);
+    // Tambah index FTS jika tabel sudah terlanjur dibuat tanpa index FTS
+    const migrationQueries = [
+      'ALTER TABLE artists ADD FULLTEXT INDEX idx_fts_artist (name)',
+      'ALTER TABLE albums ADD FULLTEXT INDEX idx_fts_album (name)',
+      'ALTER TABLE songs ADD FULLTEXT INDEX idx_fts_song (title)',
+      'ALTER TABLE artists ADD COLUMN avatar VARCHAR(255) NULL',
+      'ALTER TABLE artists ADD COLUMN bio TEXT NULL',
+      'ALTER TABLE albums ADD COLUMN description TEXT NULL',
+    ];
+    for (const q of migrationQueries) {
+      try { await conn.query(q); } catch {}
+    }
   } finally {
     conn.release();
   }

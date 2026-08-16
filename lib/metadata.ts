@@ -13,7 +13,7 @@ export interface ParsedSong {
   durationMs: number | null;
   bitrate: number | null;
   sampleRate: number | null;
-  container: string | null;
+  codec: string | null;
   picture?: { data: Buffer; format: string };
 }
 
@@ -32,14 +32,14 @@ export async function parseMetadata(filePath: string): Promise<ParsedSong> {
       durationMs: meta.format.duration ? Math.round(meta.format.duration * 1000) : null,
       bitrate: meta.format.bitrate ?? null,
       sampleRate: meta.format.sampleRate ?? null,
-      container: meta.format.container ?? null,
+      codec: meta.format.codec ?? null,
       picture: c.picture?.[0] ? { data: Buffer.from(c.picture[0].data), format: c.picture[0].format } : undefined,
     };
   } catch {
     return {
       title: null, artist: null, album: null,
       trackNo: null, discNo: null, year: null,
-      durationMs: null, bitrate: null, sampleRate: null, container: null,
+      durationMs: null, bitrate: null, sampleRate: null, codec: null,
     };
   }
 }

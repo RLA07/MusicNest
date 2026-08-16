@@ -4,6 +4,7 @@ import type { PoolConnection, ResultSetHeader } from 'mysql2/promise';
 import { pool, MUSIC_DIR } from './db';
 import { parseMetadata, folderParts, resolveArtist, resolveAlbum, resolveTitle } from './metadata';
 import { saveArtwork, findFolderArtwork, findArtistThumbnail } from './artwork';
+import { playablePathFor } from './transcode';
 
 const AUDIO_EXT = new Set(['.mp3', '.flac', '.m4a', '.m4b', '.m4p', '.aac', '.ogg', '.opus', '.wav', '.wma']);
 
@@ -91,10 +92,13 @@ export async function scanLibrary(): Promise<ScanResult> {
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [albumId, title, parsed.trackNo, parsed.discNo, parsed.durationMs, file, format, parsed.bitrate, parsed.sampleRate, stat.size, mtime]
       );
+      let songId: number;
       if (s.affectedRows === 1) {
+        songId = Number(s.insertId);
         stats.newSongs++;
       } else {
-        const [rows] = await conn.query<any[]>('SELECT mtime, size FROM songs WHERE filepath = ?', [file]);
+        const [rows] = await conn.query<any[]>('SELECT id, mtime, size FROM songs WHERE filepath = ?', [file]);
+        songId = rows[0].id;
         if (rows[0] && (rows[0].mtime !== mtime || rows[0].size !== stat.size)) {
           await conn.query(
             `UPDATE songs SET album_id=?, title=?, track_no=?, disc_no=?, duration_ms=?, format=?, bitrate=?, sample_rate=?, size=?, mtime=?
@@ -104,6 +108,9 @@ export async function scanLibrary(): Promise<ScanResult> {
           stats.updated++;
         }
       }
+
+      // Pre-transcode ALAC → AAC, biar playback instan (cache di data/transcodes/)
+      if (format === 'm4a' && parsed.codec === 'alac') playablePathFor(songId, file, format, 'alac');
 
       // LRC: cari file .lrc se-nama di folder sama (satu per lagu)
       const lrcPath = file.slice(0, -path.extname(file).length) + '.lrc';

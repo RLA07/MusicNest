@@ -1,37 +1,59 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ensureSchema, pool } from '@/lib/db';
-import ArtworkCard from '@/components/ArtworkCard';
-import MediaCard from '@/components/MediaCard';
-import Reveal from '@/components/Reveal';
+import { getOrFetchArtistMetadata } from '@/lib/artistMetadata';
+import ArtistPageClient from '@/components/ArtistPageClient';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ArtistDetail({ params }: { params: Promise<{ id: string }> }) {
+export default async function ArtistDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const artistId = Number(id);
+
+  if (isNaN(artistId)) notFound();
+
   await ensureSchema();
-  const [a] = await pool.query<any[]>('SELECT id, name FROM artists WHERE id = ?', [artistId]);
-  if (!a[0]) notFound();
-  const [albums] = await pool.query<any[]>(
-    'SELECT id, name, year, artwork FROM albums WHERE artist_id = ? ORDER BY year IS NULL, year', [artistId]
+
+  // 1. Fetch artist details
+  const [artists] = await pool.query<any[]>(
+    'SELECT id, name, avatar, bio FROM artists WHERE id = ?',
+    [artistId]
   );
+  if (!artists[0]) notFound();
+
+  // 2. Fetch/cache Deezer avatar & Wikipedia biography asynchronously
+  const meta = await getOrFetchArtistMetadata(artistId, artists[0].name);
+  const artistData = {
+    ...artists[0],
+    avatar: meta.avatar || artists[0].avatar,
+    bio: meta.bio || artists[0].bio,
+  };
+
+  // 3. Fetch albums with track count
+  const [albums] = await pool.query<any[]>(
+    `SELECT al.id, al.name, al.year, al.artwork,
+       (SELECT COUNT(*) FROM songs s WHERE s.album_id = al.id) AS track_count
+     FROM albums al
+     WHERE al.artist_id = ?
+     ORDER BY al.year DESC, al.name ASC`,
+    [artistId]
+  );
+
+  // 4. Fetch songs by artist
+  const [songs] = await pool.query<any[]>(
+    `SELECT s.id, s.title, s.duration_ms, s.track_no, s.album_id, al.name AS album_name, al.artwork, ar.name AS artist
+     FROM songs s
+     JOIN albums al ON s.album_id = al.id
+     JOIN artists ar ON al.artist_id = ar.id
+     WHERE ar.id = ?
+     ORDER BY s.title ASC`,
+    [artistId]
+  );
+
   return (
-    <div>
-      <div className="flex items-center gap-6 mb-8">
-        <ArtworkCard artwork={albums.find(a => a.artwork)?.artwork ?? null} alt={a[0].name} size={200} />
-        <div>
-          <h1 className="text-3xl font-semibold">{a[0].name}</h1>
-          <p className="text-muted mt-1">{albums.length} album</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        {albums.map((al, i) => (
-          <Reveal key={al.id} delayMs={i * 40}>
-            <MediaCard href={`/albums/${al.id}`} artwork={al.artwork} title={al.name} subtitle={al.year?.toString()} />
-          </Reveal>
-        ))}
-      </div>
-    </div>
+    <ArtistPageClient
+      artist={artistData}
+      albums={albums}
+      songs={songs}
+    />
   );
 }

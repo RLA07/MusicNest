@@ -2,11 +2,20 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import type { Song } from '@/lib/types';
 
+// simple toast — one message at a time
+function useToast() {
+  const [toast, setToast] = useState<string | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(t);
+  }, [toast]);
+  return { toast, show: setToast };
+}
+
 type RepeatMode = 'off' | 'all' | 'one';
 
 interface PlayerState {
-  queue: Song[];
-  index: number;
   current: Song | null;
   isPlaying: boolean;
   currentTime: number;
@@ -24,7 +33,9 @@ interface PlayerState {
   setVolume: (v: number) => void;
   toggleMute: () => void;
   toggleShuffle: () => void;
+  shuffleAll: () => Promise<void>;
   cycleRepeat: () => void;
+  toast: string | null;
 }
 
 const PlayerCtx = createContext<PlayerState | null>(null);
@@ -41,8 +52,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const indexRef = useRef(0);
   const shuffleRef = useRef(false);
   const repeatRef = useRef<RepeatMode>('off');
-  const [queue, setQueue] = useState<Song[]>([]);
-  const [index, setIndex] = useState(0);
   const [current, setCurrent] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -51,6 +60,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const [muted, setMuted] = useState(false);
   const [shuffle, setShuffle] = useState(false);
   const [repeat, setRepeat] = useState<RepeatMode>('off');
+  const { toast, show: showToast } = useToast();
 
   /** Pindah +delta lagu. stopAtEnd = jangan wrap (ujung queue = berhenti). */
   function step(delta: number, stopAtEnd = false) {
@@ -84,7 +94,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
       if (ni < 0) ni = q.length - 1;
     }
     indexRef.current = ni;
-    setIndex(ni);
     setCurrent(q[ni]);
     const a = audioRef.current!;
     a.src = `/api/stream/${q[ni].id}`;
@@ -100,15 +109,13 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     audio.ontimeupdate = () => setCurrentTime(audio.currentTime);
     audio.onloadedmetadata = () => setDuration(audio.duration || 0);
     audio.onended = () => step(1, true);
-    audio.onerror = () => step(1); // file corrupt → lompat
+    audio.onerror = () => { showToast('Lagu gagal diputar, melewati...'); step(1); };
   }
   const audio = audioRef.current!;
 
   const playSong = (song: Song) => {
     queueRef.current = [song];
     indexRef.current = 0;
-    setQueue([song]);
-    setIndex(0);
     setCurrent(song);
     audio.src = `/api/stream/${song.id}`;
     audio.play();
@@ -118,8 +125,6 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   const setQueueAndPlay = (songs: Song[], startIndex: number) => {
     queueRef.current = songs;
     indexRef.current = startIndex;
-    setQueue(songs);
-    setIndex(startIndex);
     setCurrent(songs[startIndex]);
     audio.src = `/api/stream/${songs[startIndex].id}`;
     audio.play();
@@ -162,6 +167,24 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
     setShuffle(shuffleRef.current);
   };
 
+  const shuffleAll = async () => {
+    try {
+      const res = await fetch('/api/songs/random');
+      if (!res.ok) throw new Error('Gagal mengambil lagu acak');
+      const songs: Song[] = await res.json();
+      if (!songs.length) {
+        showToast('Pustaka musik kosong.');
+        return;
+      }
+      shuffleRef.current = true;
+      setShuffle(true);
+      setQueueAndPlay(songs, 0);
+      showToast(`Memutar ${songs.length} lagu secara acak`);
+    } catch {
+      showToast('Gagal memuat lagu acak');
+    }
+  };
+
   const cycleRepeat = () => {
     const next: RepeatMode = repeatRef.current === 'off' ? 'all' : repeatRef.current === 'all' ? 'one' : 'off';
     repeatRef.current = next;
@@ -171,7 +194,7 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   // keyboard shortcuts (Space play/pause, ArrowNext/Prev, M mute)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLButtonElement) return;
       if (e.code === 'Space') { e.preventDefault(); toggle(); }
       else if (e.key === 'm' || e.key === 'M') toggleMute();
     };
@@ -180,10 +203,17 @@ export function PlayerProvider({ children }: { children: React.ReactNode }) {
   }, [toggle, toggleMute]);
 
   const value: PlayerState = {
-    queue, index, current, isPlaying, currentTime, duration, volume, muted, shuffle, repeat,
+    current, isPlaying, currentTime, duration, volume, muted, shuffle, repeat, toast,
     playSong, setQueueAndPlay, playNext: () => step(1), playPrev: () => step(-1),
-    toggle, seek, setVolume: setVol, toggleMute, toggleShuffle, cycleRepeat,
+    toggle, seek, setVolume: setVol, toggleMute, toggleShuffle, shuffleAll, cycleRepeat,
   };
 
-  return <PlayerCtx.Provider value={value}>{children}</PlayerCtx.Provider>;
+  return <PlayerCtx.Provider value={value}>
+    {children}
+    {toast && (
+      <div role="status" aria-live="polite" className="fixed bottom-24 md:bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-surface-hover border border-border text-sm text-foreground shadow-lg">
+        {toast}
+      </div>
+    )}
+  </PlayerCtx.Provider>;
 }

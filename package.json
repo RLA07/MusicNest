@@ -7,14 +7,16 @@
     "dev": "next dev -p 3030",
     "scan": "tsx scripts/scan.ts",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p 3030"
   },
   "dependencies": {
+    "fuse.js": "^7.5.0",
     "music-metadata": "^11.14.0",
     "mysql2": "^3.23.3",
     "next": "16.3.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
@@ -22,7 +24,6 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "playwright": "^1.62.1",
     "tailwindcss": "^4",
     "tsx": "^4.23.12",
     "typescript": "^5"

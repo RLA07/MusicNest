@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function AddSongs({ playlistId, current }: { playlistId: number; current: number[] }) {
@@ -7,6 +7,22 @@ export default function AddSongs({ playlistId, current }: { playlistId: number; 
   const [q, setQ] = useState('');
   const [results, setResults] = useState<any[]>([]);
   const router = useRouter();
+  const wrap = useRef<HTMLDivElement>(null);
+
+  // Escape-close + click-outside
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    const onDoc = (e: MouseEvent) => {
+      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    document.addEventListener('mousedown', onDoc);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.removeEventListener('mousedown', onDoc);
+    };
+  }, [open]);
 
   async function search(term: string) {
     setQ(term);
@@ -23,12 +39,12 @@ export default function AddSongs({ playlistId, current }: { playlistId: number; 
   }
 
   return (
-    <div className="relative">
+    <div className="relative" ref={wrap}>
       <button onClick={() => setOpen(!open)} className="rounded-full bg-surface px-4 py-2 text-sm font-medium hover:bg-surface-hover transition-colors cursor-pointer">
         + Tambah Lagu
       </button>
       {open && (
-        <div className="absolute right-0 top-12 z-30 w-96 rounded-xl border border-border bg-surface shadow-2xl shadow-black/50 p-4">
+        <div className="absolute right-0 top-12 z-30 w-72 sm:w-96 max-w-[90vw] rounded-xl border border-border bg-surface shadow-2xl shadow-black/50 p-4">
           <input
             value={q}
             onChange={(e) => search(e.target.value)}

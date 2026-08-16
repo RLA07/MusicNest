@@ -28,8 +28,41 @@ export default function PlayerBar({ onExpand }: { onExpand?: () => void }) {
   if (!p.current) return null;
   const progress = p.duration ? (p.currentTime / p.duration) * 100 : 0;
   return (
-    <div className="fixed bottom-0 inset-x-0 border-t border-border bg-surface/95 backdrop-blur z-40">
-      <div className="flex items-center gap-4 px-4 py-3">
+    <div className="fixed bottom-0 inset-x-0 z-40 md:z-40">
+      {/* Mobile: compact bar di atas bottom-nav */}
+      <div className="md:hidden fixed bottom-[62px] inset-x-0 flex items-center gap-3 px-3 pt-2.5 pb-2 border-t border-border bg-surface/95 backdrop-blur">
+        <button onClick={onExpand} className="flex items-center gap-3 min-w-0 flex-1 text-left group">
+          <div className="relative shrink-0">
+            {p.current.artwork ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={`/api/artwork/${p.current.artwork}`} alt="" className={`h-11 w-11 rounded-full object-cover ${p.isPlaying ? 'vinyl-spin' : ''}`} />
+            ) : (
+              <div className="h-11 w-11 rounded-full bg-surface-hover" />
+            )}
+            {p.isPlaying && (
+              <span className="absolute inset-0 rounded-full ring-1 ring-black/30" aria-hidden="true" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium group-hover:underline">{p.current.title}</p>
+            <p className="truncate text-xs text-muted">{p.current.artist}</p>
+          </div>
+        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button onClick={() => p.playPrev()} aria-label="Lagu sebelumnya" className="text-muted hover:text-foreground transition-colors p-1 cursor-pointer active:scale-90">
+            <Icon name="prev" />
+          </button>
+          <button onClick={p.toggle} aria-label={p.isPlaying ? 'Jeda' : 'Putar'} className="rounded-full bg-accent text-on-accent p-2.5 hover:bg-accent-hover active:scale-90 transition-all cursor-pointer">
+            <Icon name={p.isPlaying ? 'pause' : 'play'} size={22} />
+          </button>
+          <button onClick={() => p.playNext()} aria-label="Lagu berikutnya" className="text-muted hover:text-foreground transition-colors p-1 cursor-pointer active:scale-90">
+            <Icon name="next" />
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop: full bar */}
+      <div className="hidden md:flex items-center gap-4 px-4 py-3 border-t border-border bg-surface/95 backdrop-blur">
         {/* kiri: info + vinyl */}
         <button onClick={onExpand} className="flex items-center gap-3 min-w-0 w-[26%] text-left group">
           <div className="relative shrink-0">
@@ -53,21 +86,23 @@ export default function PlayerBar({ onExpand }: { onExpand?: () => void }) {
         <div className="flex-1 flex flex-col items-center gap-1">
           <div className="flex items-center gap-4">
             <button onClick={p.toggleShuffle} aria-label="Acak" aria-pressed={p.shuffle}
-              className={`p-1 transition-colors cursor-pointer ${p.shuffle ? 'text-accent' : 'text-muted hover:text-foreground'}`}>
+              className={`relative p-1 transition-colors cursor-pointer ${p.shuffle ? 'text-accent' : 'text-muted hover:text-foreground'}`}>
               <Icon name="shuffle" size={18} />
+              <span aria-hidden="true" className={`absolute left-1/2 -translate-x-1/2 -bottom-0.5 h-1 w-1 rounded-full bg-accent ${p.shuffle ? 'opacity-100' : 'opacity-0'}`} />
             </button>
             <button onClick={() => p.playPrev()} aria-label="Lagu sebelumnya" className="text-muted hover:text-foreground transition-colors p-1 cursor-pointer">
               <Icon name="prev" />
             </button>
-            <button onClick={p.toggle} aria-label={p.isPlaying ? 'Jeda' : 'Putar'} className="rounded-full bg-accent text-on-accent p-2.5 hover:bg-accent-hover hover:scale-105 active:scale-95 transition-all cursor-pointer">
+            <button onClick={p.toggle} aria-label={p.isPlaying ? 'Jeda' : 'Putar'} className="rounded-full bg-accent text-on-accent p-2.5 hover:bg-accent-hover hover:scale-105 active:scale-90 transition-all cursor-pointer">
               <Icon name={p.isPlaying ? 'pause' : 'play'} size={22} />
             </button>
             <button onClick={() => p.playNext()} aria-label="Lagu berikutnya" className="text-muted hover:text-foreground transition-colors p-1 cursor-pointer">
               <Icon name="next" />
             </button>
             <button onClick={p.cycleRepeat} aria-label="Ulangi" aria-pressed={p.repeat !== 'off'}
-              className={`p-1 transition-colors cursor-pointer ${p.repeat !== 'off' ? 'text-accent' : 'text-muted hover:text-foreground'}`}>
+              className={`relative p-1 transition-colors cursor-pointer ${p.repeat !== 'off' ? 'text-accent' : 'text-muted hover:text-foreground'}`}>
               <Icon name={p.repeat === 'one' ? 'repeat1' : 'repeat'} size={18} />
+              <span aria-hidden="true" className={`absolute left-1/2 -translate-x-1/2 -bottom-0.5 h-1 w-1 rounded-full bg-accent ${p.repeat !== 'off' ? 'opacity-100' : 'opacity-0'}`} />
             </button>
           </div>
           <div className="flex items-center gap-2 w-full max-w-lg text-xs text-muted tabular-nums">

@@ -4,6 +4,7 @@ import { getFavIds } from '@/lib/favorites';
 import SongList from '@/components/SongList';
 import AddSongs from './AddSongs';
 import DeletePlaylist from './DeletePlaylist';
+import PlaylistSongs from './PlaylistSongs';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +34,7 @@ export default async function PlaylistDetail({ params }: { params: Promise<{ id:
       </div>
       {songs.length === 0
         ? <p className="text-muted text-sm">Playlist kosong. Tambah lagu dari album.</p>
-        : <SongList songs={songs} showAlbum favs={favs} />
+        : <PlaylistSongs songs={songs} favs={favs} playlistId={id} />
       }
     </div>
   );

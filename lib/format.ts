@@ -1,6 +1,6 @@
 /** ms → "mm:ss" (jam → "h:mm:ss"). */
 export function fmtDuration(ms: number | null): string {
-  if (!ms) return '--:--';
+  if (!ms || !Number.isFinite(ms) || ms <= 0) return '--:--';
   const total = Math.round(ms / 1000);
   const h = Math.floor(total / 3600);
   const m = Math.floor((total % 3600) / 60);

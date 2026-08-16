@@ -31,7 +31,8 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (local only — .env.example is tracked)
-.env*.local
+.env
+.env.*
 !.env.example
 
 # runtime data (artworks hasil scan)
@@ -46,3 +47,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude & tools
+CLAUDE.md
+.playwright-mcp
+.vscode/

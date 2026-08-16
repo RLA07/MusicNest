@@ -1,17 +1,22 @@
 -- Tabel artists
 CREATE TABLE IF NOT EXISTS artists (
-  id   INT PRIMARY KEY AUTO_INCREMENT,
-  name VARCHAR(255) NOT NULL UNIQUE
+  id     INT PRIMARY KEY AUTO_INCREMENT,
+  name   VARCHAR(255) NOT NULL UNIQUE,
+  avatar VARCHAR(255) NULL,                       -- foto profil artis dari Deezer/external
+  bio    TEXT NULL,                               -- biografi/deskripsi artis dari Wikipedia
+  FULLTEXT KEY idx_fts_artist (name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabel albums
 CREATE TABLE IF NOT EXISTS albums (
-  id        INT PRIMARY KEY AUTO_INCREMENT,
-  artist_id INT NOT NULL,
-  name      VARCHAR(255) NOT NULL,
-  year      INT NULL,
-  artwork   VARCHAR(255) NULL,                    -- nama file di data/artworks/, NULL = placeholder
+  id          INT PRIMARY KEY AUTO_INCREMENT,
+  artist_id   INT NOT NULL,
+  name        VARCHAR(255) NOT NULL,
+  year        INT NULL,
+  artwork     VARCHAR(255) NULL,                    -- nama file di data/artworks/, NULL = placeholder
+  description TEXT NULL,                            -- deskripsi album
   UNIQUE KEY uniq_artist_album (artist_id, name),
+  FULLTEXT KEY idx_fts_album (name),
   CONSTRAINT fk_albums_artist FOREIGN KEY (artist_id) REFERENCES artists(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -31,6 +36,7 @@ CREATE TABLE IF NOT EXISTS songs (
   mtime       BIGINT NULL,                        -- file mtime, untuk rescan idempotent
   KEY idx_songs_album (album_id),
   KEY idx_songs_title (title),
+  FULLTEXT KEY idx_fts_song (title),
   CONSTRAINT fk_songs_album FOREIGN KEY (album_id) REFERENCES albums(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
