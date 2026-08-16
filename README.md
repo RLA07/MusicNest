@@ -101,13 +101,13 @@ Saat halaman artis dibuka pertama kali, MusicNest otomatis mengambil dan menyimp
 
 <div align="center">
   <img src="public/screenshots/home.png" alt="Home"/>
-  <p>Beranda</p>
+  <p>Beranda</p> <br>
   <img src="public/screenshots/full-player.png" alt="Full Player"/>
-  <p>Full Player</p>
+  <p>Full Player</p> <br>
   <img src="public/screenshots/Detail_Artist.png" alt="Detail Artist"/>
-  <p>Detail Artist</p>
+  <p>Detail Artist</p> <br>
   <img src="public/screenshots/Detail_Album.png" alt="Detail Album"/>
-  <p>Detail Album</p>
+  <p>Detail Album</p> <br>
   <img src="public/screenshots/search.png" alt="Search"/>
   <p>Search</p>
 </div>
