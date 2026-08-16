@@ -100,15 +100,15 @@ Saat halaman artis dibuka pertama kali, MusicNest otomatis mengambil dan menyimp
 ## Screenshots
 
 <div align="center">
-  <img src="public/screenshots/home.png" alt="Home"/>
+  <img src="public/screenshots/home.avif" alt="Home"/>
   <p>Beranda</p> <br>
-  <img src="public/screenshots/full-player.png" alt="Full Player"/>
+  <img src="public/screenshots/full-player.avif" alt="Full Player"/>
   <p>Full Player</p> <br>
-  <img src="public/screenshots/Detail_Artist.png" alt="Detail Artist"/>
+  <img src="public/screenshots/Detail_Artist.avif" alt="Detail Artist"/>
   <p>Detail Artist</p> <br>
-  <img src="public/screenshots/Detail_Album.png" alt="Detail Album"/>
+  <img src="public/screenshots/Detail_Album.avif" alt="Detail Album"/>
   <p>Detail Album</p> <br>
-  <img src="public/screenshots/search.png" alt="Search"/>
+  <img src="public/screenshots/search.avif" alt="Search"/>
   <p>Search</p>
 </div>
 
