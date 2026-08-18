@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>Pemutar musik pribadi berbasis web, self-hosted, dan berjalan di jaringan lokal (LAN).</strong><br/>
-  Dirancang untuk mereka yang ingin menikmati koleksi musik lokal dengan pengalaman se-modern Spotify atau YouTube Music.
+  Dirancang untuk mereka yang ingin menikmati koleksi musik lokal dengan pengalaman se-modern Spotify atau YouTube Music.<br/>
   Dibuat oleh Saya ( + claude :) )
 </p>
 
